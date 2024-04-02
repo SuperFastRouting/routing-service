@@ -1,8 +1,12 @@
 # routing-service
-Flask application for routing calculation
+Django application for routing calculation
 
-To run:
-Make a venv.
-Install reqs.
-Run the flask app by typing the following command:
-flask --app app run
+
+Conda environment quick guide:
+conda env create (in base directory)
+
+conda activate routing-service
+
+conda env update --file environment.yml
+
+conda deactivate
