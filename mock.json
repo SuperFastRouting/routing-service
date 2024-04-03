@@ -1,0 +1,55 @@
+// Body for the POST request from front-end (Sehbazz to Ajit)
+{
+    "source": "1, 1",
+    "destinations": [
+        "2, 2",
+        "3, 3"
+    ],
+    "truckIDs": [
+        "1", "2"
+    ]
+}
+
+// Send a POST request to Django, in your body you have: (Ajit to Calvin)
+
+{
+    "source": "1, 1",
+    "destinations": [
+        "2, 2",
+        "3, 3"
+    ],
+    "numberOfActors": 2,
+}
+
+// Response from the POST from Django (JSON) (Calvin to Ajit)
+
+{
+    "routeID": 111111111,
+    "paths": [
+        ["1, 1", "1, 2", "2, 2"],
+        ["1, 1", "3, 1", "3, 2", "3, 3"]
+    ]
+}
+
+// Response from POST from node (JSON) (Ajit to Sehbazz)
+
+{
+    "routeID": 111111111,
+    "paths": [
+        ["1, 1", "1, 2", "2, 2"],
+        ["1, 1", "3, 1", "3, 2", "3, 3"]
+    ]
+}
+
+
+
+
+// GET request URL: /routes/<routeID>/<truckID>
+
+{
+    "path": [
+        "1, 1",
+        "1, 2",
+        "2, 2"
+    ]
+}

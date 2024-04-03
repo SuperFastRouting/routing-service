@@ -13,3 +13,4 @@ dependencies:
     - matplotlib
     - scikit-learn
     - django
+    - shapely

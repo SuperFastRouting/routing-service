@@ -1,3 +1,4 @@
+import os
 import pandas
 
 import pyrosm
@@ -42,12 +43,27 @@ def calculate_basic_route(osm):
     print(route)
     # fig, ax = ox.plot_graph_route(G, route, route_linewidth=6, node_size=0, bgcolor='k')
 
+def generate_nodes_and_edges(osm):
+    nodes, edges = osm.get_network(network_type="driving", nodes=True)
+    
+    return (nodes, edges)
+
+def get_osm_data():
+    dir = os.getcwd()
+    print(dir)
+    fp = get_data("calgary", directory="routing/data")
+    # osm = OSM(fp)
+    osm = OSM(get_data("test_pbf"))
+
+    return osm
+
 def main():
-    fp = get_data("calgary", directory="../data")
+    fp = get_data("calgary", directory="./data")
     print(fp)
 
     # Initialize OSM parser
     osm = OSM(fp)
+    
     # osm = OSM(get_data("test_pbf"))
     print(type(osm))
     
