@@ -7,13 +7,28 @@ import osmnx as ox
 import networkx as nx
 
 def plot_drivables(osm):
-    # Generate chart for drivable roads
+    """Generate chart for drivable roads (UNUSED)
+
+    Parameters:
+    osm (OSM): pyrosm OSM data loader
+
+    Returns:
+    N/A
+    """
     drive_net = osm.get_network(network_type="driving")
     print(type(drive_net))
     print(drive_net)
     drive_net.plot()
 
 def calculate_basic_route(osm):
+    """Calculates a basic route (testing function) (UNUSED)
+
+    Parameters:
+    osm (OSM): pyrosm OSM data loader
+
+    Returns:
+    N/A
+    """
     # nodes, edges = osm.get_network(nodes=True)
     nodes, edges = osm.get_network(network_type="driving", nodes=True)
 
@@ -44,16 +59,32 @@ def calculate_basic_route(osm):
     # fig, ax = ox.plot_graph_route(G, route, route_linewidth=6, node_size=0, bgcolor='k')
 
 def generate_nodes_and_edges(osm):
+    """Generates nodes and edges given an OSM loader
+
+    Parameters:
+    osm (OSM): pyrosm OSM data loader
+
+    Returns:
+    (nodes, edges) (tuple): A tuple of nodes and edges for a given network
+    """
     nodes, edges = osm.get_network(network_type="driving", nodes=True)
     
     return (nodes, edges)
 
-def get_osm_data():
-    dir = os.getcwd()
-    print(dir)
-    fp = get_data("calgary", directory="routing/data")
-    # osm = OSM(fp)
-    osm = OSM(get_data("test_pbf"))
+def get_osm_data(debug=False):
+    """Generates OSM data loader (Default set to Calgary)
+
+    Parameters:
+    debug (bool): Enables debug mode for using the test protobuf file
+
+    Returns:
+    osm (OSM): pyrosm OSM data loader
+    """
+    if (debug):
+        osm = OSM(get_data("test_pbf"))
+    else:
+        fp = get_data("calgary", directory="routing/data")
+        osm = OSM(fp)
 
     return osm
 
@@ -68,9 +99,7 @@ def main():
     print(type(osm))
     
     plot_drivables(osm=osm)
-
     calculate_basic_route(osm=osm)
-
     
     # End
     return 0

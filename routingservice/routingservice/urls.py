@@ -21,5 +21,5 @@ from routing import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('routing/', views.index)
+    path('routing/', views.route)
 ]
