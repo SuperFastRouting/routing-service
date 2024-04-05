@@ -142,7 +142,7 @@ def generate_path_coordinates(request, source, targets, num_agents):
         route = route_distance_tuple[0]
         distance = route_distance_tuple[1]
         routes.append(route)
-        distances.append(distance)
+        distances.append(round(distance/1000, 6)) # Convert from m to km
 
 
     print(routes)
