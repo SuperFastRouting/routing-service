@@ -1,8 +1,10 @@
+import json
+
 import osmnx as ox
 import networkx as nx
 
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 
 from shapely.geometry import Point
 
@@ -22,35 +24,67 @@ def route(request):
     Returns:
     JsonResponse
     """
-    # 60.538124, 26.931938 source
-    # 60.523491, 26.945637 destination
-    route_obj = Route.objects.create()
 
-    print(route_obj.get_route_id())
+    if request.method == 'POST':
+        request_body = json.loads(request.body)
 
-    # For points, x = lon, y = lat
-    source_point = Point(26.931938, 60.538124)
-    destination_points = [
-        (26.945637, 60.523491),
-        (26.944521, 60.525898),
-        (26.946527, 60.526283),
-    ]
+        print(request_body)
+        num_agents = request_body.get('numberOfActors')
+        source_node_split = request_body.get('source').split(",")
+        source_point = (float(source_node_split[0].strip()), float(source_node_split[1].strip()))
 
-    path_distance_tuple = generate_path_coordinates(request, source_point, destination_points, 2)
-    path_coordinates = path_distance_tuple[0]
-    path_distances = path_distance_tuple[1]
-    
-    json_return = {
-        "routeID": route_obj.get_numerical_id(),
-        "paths": path_coordinates,
-        "distances": path_distances,
-    }
+        destination_points = []
+        for dest_point in request_body.get('destinations'):
+            dest_node_split = dest_point.split(",")
+            destination_points.append((float(dest_node_split[0].strip()), float(dest_node_split[1].strip())))
 
-    print(json_return)
+        # 60.538124, 26.931938 source
+        # 60.523491, 26.945637 destination
+        route_obj = Route.objects.create()
 
-    return JsonResponse(json_return, status=200)
+        print(route_obj.get_route_id())
+
+        # For points, x = lon, y = lat
+        # source_point = (26.931938, 60.538124)
+        # destination_points = [
+        #     (26.945637, 60.523491),
+        #     (26.944521, 60.525898),
+        #     (26.946527, 60.526283),
+        # ]
+
+        path_distance_tuple = generate_path_coordinates(
+            request,
+            source_point,
+            destination_points,
+            num_agents,
+        )
+        path_coordinates = path_distance_tuple[0]
+        path_distances = path_distance_tuple[1]
+        
+        json_return = {
+            "routeID": route_obj.get_numerical_id(),
+            "paths": path_coordinates,
+            "distances": path_distances,
+        }
+
+        print(json_return)
+
+        return JsonResponse(json_return, status=200)
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def generate_path_coordinates(request, source, targets, num_agents):
+    """Generates coordinates for a generated shortest path
+
+    Parameters:
+    request: Incoming HTTP Request
+    source: Source node
+    targets: Target nodes
+    num_agents (int): Number of agents from source
+
+    Returns:
+    (route_coords, distances) (tuple): Coordinates of every node on a route + total distance of route
+    """
     # Generate OSM data reader
     osm = routing.get_osm_data(debug=True)
 
@@ -72,7 +106,7 @@ def generate_path_coordinates(request, source, targets, num_agents):
     # print(source.y)
 
     # Find nodes closest to given points
-    source_node_id = ox.nearest_nodes(G, X=source.x, Y=source.y)
+    source_node_id = ox.nearest_nodes(G, X=source[0], Y=source[1])
     source_node = nodes_df[nodes_df['id'] == source_node_id]
     source_coords = (source_node.iloc[0]['lon'], source_node.iloc[0]['lat'])
 
@@ -137,9 +171,12 @@ def generate_single_path(graph, origin, destinations):
         for node in nodes:
             paths = paths + nx.shortest_path(graph, origin_node, node, method='dijkstra')[1:]
             path_length += nx.shortest_path_length(graph, origin_node, node, method='dijkstra')
+            print("DISTANCE: ")
+            print(path_length)
             origin_node = node
     else:
         paths = nx.shortest_path(graph, origin, destinations[0], method='dijkstra')
+        path_length = nx.shortest_path_length(graph, origin, destinations[0], method='dijkstra')
 
     return (paths, path_length)
 
