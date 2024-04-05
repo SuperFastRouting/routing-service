@@ -1,4 +1,5 @@
 import json
+import math
 
 import osmnx as ox
 import networkx as nx
@@ -175,15 +176,30 @@ def generate_single_path(graph, origin, destinations):
         origin_node = origin
         for node in nodes:
             paths = paths + nx.shortest_path(graph, origin_node, node, method='dijkstra')[1:]
-            path_length += nx.shortest_path_length(graph, origin_node, node, method='dijkstra')
+            path_length += nx.shortest_path_length(
+                graph,
+                origin_node,
+                node,
+                weight=calculate_edge_weight,
+                method='dijkstra'
+            )
             print("DISTANCE: ")
             print(path_length)
             origin_node = node
     else:
         paths = nx.shortest_path(graph, origin, destinations[0], method='dijkstra')
-        path_length = nx.shortest_path_length(graph, origin, destinations[0], method='dijkstra')
+        path_length = nx.shortest_path_length(
+            graph,
+            origin,
+            destinations[0],
+            weight=calculate_edge_weight,
+            method='dijkstra'
+        )
 
     return (paths, path_length)
+
+def calculate_edge_weight(start_point, end_point, attributes):
+    return attributes[0]['length']
 
 def find_destination_order(graph, source_node, dest_nodes, nodes_in_order):
     origin_node = source_node
@@ -197,7 +213,7 @@ def find_destination_order(graph, source_node, dest_nodes, nodes_in_order):
     
     path_lengths = []
     for dest_node in destination_nodes:
-        path_lengths.append(nx.shortest_path_length(graph, origin_node, dest_node))
+        path_lengths.append(nx.shortest_path_length(graph, origin_node, dest_node, weight=calculate_edge_weight))
 
     min_index = path_lengths.index(min(path_lengths))
     min_node = destination_nodes.pop(min_index)
@@ -209,7 +225,4 @@ def find_destination_order(graph, source_node, dest_nodes, nodes_in_order):
         dest_nodes=destination_nodes,
         nodes_in_order=ordered_nodes,
     )
-    
-
-
     
