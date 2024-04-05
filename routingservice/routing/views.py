@@ -30,12 +30,14 @@ def route(request):
 
         print(request_body)
         num_agents = request_body.get('numberOfActors')
-        source_node_split = request_body.get('source').split(",")
+        source_node_dict = request_body.get('source')
+        
+        source_node_split = [source_node_dict['home_long'], source_node_dict['home_lat']]
         source_point = (float(source_node_split[0].strip()), float(source_node_split[1].strip()))
 
         destination_points = []
         for dest_point in request_body.get('destinations'):
-            dest_node_split = dest_point.split(",")
+            dest_node_split = [dest_point['longitude'], dest_point['latitude']]
             destination_points.append((float(dest_node_split[0].strip()), float(dest_node_split[1].strip())))
 
         # 60.538124, 26.931938 source
