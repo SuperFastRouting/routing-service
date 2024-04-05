@@ -29,16 +29,16 @@ def route(request):
         request_body = json.loads(request.body)
 
         print(request_body)
-        num_agents = request_body.get('numberOfActors')
+        num_agents = request_body.get('numTrucks')
         source_node_dict = request_body.get('source')
         
         source_node_split = [source_node_dict['home_long'], source_node_dict['home_lat']]
-        source_point = (float(source_node_split[0].strip()), float(source_node_split[1].strip()))
+        source_point = (float(source_node_split[0]), float(source_node_split[1]))
 
         destination_points = []
         for dest_point in request_body.get('destinations'):
             dest_node_split = [dest_point['longitude'], dest_point['latitude']]
-            destination_points.append((float(dest_node_split[0].strip()), float(dest_node_split[1].strip())))
+            destination_points.append((float(dest_node_split[0]), float(dest_node_split[1])))
 
         # 60.538124, 26.931938 source
         # 60.523491, 26.945637 destination
