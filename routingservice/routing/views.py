@@ -152,7 +152,10 @@ def generate_path_coordinates(request, source, targets, num_agents):
         for node_id in route_nodes:
             # try:
             node = nodes_df[nodes_df['id'] == node_id]
-            node_coords = (node.iloc[0]['lon'], node.iloc[0]['lat'])
+            node_coords = {
+                "lon": node.iloc[0]['lon'],
+                "lat": node.iloc[0]['lat'],
+            }
             route_coords[route_counter].append(node_coords)
             # except Exception:
             #     print("No matching node found...")
