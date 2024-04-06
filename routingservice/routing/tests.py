@@ -8,8 +8,8 @@ class RouteTestCase(TestCase):
     def setUp(self):
         self.osm = routing.get_osm_data(debug=True)
         self.nodes_edges_tuple = routing.generate_nodes_and_edges(self.osm)
-        self.num_actors = 1
-        self.num_destinations = 1
+        self.num_actors = 2
+        self.num_destinations = 3
 
         random_nodes = random.sample(range(1, len(self.nodes_edges_tuple[0])), self.num_destinations + 1)
         nodes_df = self.nodes_edges_tuple[0]
@@ -25,12 +25,18 @@ class RouteTestCase(TestCase):
         destination_points = []
 
         for i in range(0, self.num_destinations):
-            destination_points.append(f"{self.destinations[i]['lon']}, {self.destinations[i]['lat']}")
+            destination_points.append({
+                "longitude": self.destinations[i]['lon'],
+                "latitude": self.destinations[i]['lat']
+            })
 
         test_json = {
-            "source": f"{self.source['lon']}, {self.source['lat']}",
+            "source": {
+                "home_long": self.source['lon'],
+                "home_lat": self.source['lat'],
+            },
             "destinations": destination_points,
-            "numberOfActors": self.num_actors,
+            "numTrucks": self.num_actors,
         }
 
         response = client.post("/routing/", test_json, content_type='application/json')

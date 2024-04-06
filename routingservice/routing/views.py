@@ -1,4 +1,5 @@
 import json
+import math
 
 import osmnx as ox
 import networkx as nx
@@ -29,14 +30,16 @@ def route(request):
         request_body = json.loads(request.body)
 
         print(request_body)
-        num_agents = request_body.get('numberOfActors')
-        source_node_split = request_body.get('source').split(",")
-        source_point = (float(source_node_split[0].strip()), float(source_node_split[1].strip()))
+        num_agents = request_body.get('numTrucks')
+        source_node_dict = request_body.get('source')
+        
+        source_node_split = [source_node_dict['home_long'], source_node_dict['home_lat']]
+        source_point = (float(source_node_split[0]), float(source_node_split[1]))
 
         destination_points = []
         for dest_point in request_body.get('destinations'):
-            dest_node_split = dest_point.split(",")
-            destination_points.append((float(dest_node_split[0].strip()), float(dest_node_split[1].strip())))
+            dest_node_split = [dest_point['longitude'], dest_point['latitude']]
+            destination_points.append((float(dest_node_split[0]), float(dest_node_split[1])))
 
         # 60.538124, 26.931938 source
         # 60.523491, 26.945637 destination
@@ -139,7 +142,7 @@ def generate_path_coordinates(request, source, targets, num_agents):
         route = route_distance_tuple[0]
         distance = route_distance_tuple[1]
         routes.append(route)
-        distances.append(distance)
+        distances.append(round(distance/1000, 6)) # Convert from m to km
 
 
     print(routes)
@@ -152,7 +155,10 @@ def generate_path_coordinates(request, source, targets, num_agents):
         for node_id in route_nodes:
             # try:
             node = nodes_df[nodes_df['id'] == node_id]
-            node_coords = (node.iloc[0]['lon'], node.iloc[0]['lat'])
+            node_coords = {
+                "lon": node.iloc[0]['lon'],
+                "lat": node.iloc[0]['lat'],
+            }
             route_coords[route_counter].append(node_coords)
             # except Exception:
             #     print("No matching node found...")
@@ -170,15 +176,30 @@ def generate_single_path(graph, origin, destinations):
         origin_node = origin
         for node in nodes:
             paths = paths + nx.shortest_path(graph, origin_node, node, method='dijkstra')[1:]
-            path_length += nx.shortest_path_length(graph, origin_node, node, method='dijkstra')
+            path_length += nx.shortest_path_length(
+                graph,
+                origin_node,
+                node,
+                weight=calculate_edge_weight,
+                method='dijkstra'
+            )
             print("DISTANCE: ")
             print(path_length)
             origin_node = node
     else:
         paths = nx.shortest_path(graph, origin, destinations[0], method='dijkstra')
-        path_length = nx.shortest_path_length(graph, origin, destinations[0], method='dijkstra')
+        path_length = nx.shortest_path_length(
+            graph,
+            origin,
+            destinations[0],
+            weight=calculate_edge_weight,
+            method='dijkstra'
+        )
 
     return (paths, path_length)
+
+def calculate_edge_weight(start_point, end_point, attributes):
+    return attributes[0]['length']
 
 def find_destination_order(graph, source_node, dest_nodes, nodes_in_order):
     origin_node = source_node
@@ -192,7 +213,7 @@ def find_destination_order(graph, source_node, dest_nodes, nodes_in_order):
     
     path_lengths = []
     for dest_node in destination_nodes:
-        path_lengths.append(nx.shortest_path_length(graph, origin_node, dest_node))
+        path_lengths.append(nx.shortest_path_length(graph, origin_node, dest_node, weight=calculate_edge_weight))
 
     min_index = path_lengths.index(min(path_lengths))
     min_node = destination_nodes.pop(min_index)
@@ -204,7 +225,4 @@ def find_destination_order(graph, source_node, dest_nodes, nodes_in_order):
         dest_nodes=destination_nodes,
         nodes_in_order=ordered_nodes,
     )
-    
-
-
     
