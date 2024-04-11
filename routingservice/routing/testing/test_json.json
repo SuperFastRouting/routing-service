@@ -1,9 +1,21 @@
 {
-    "source": "26.931938, 60.538124",
+    "source": {
+        "home_long": -114.15405,
+        "home_lat": 51.15266
+    },
     "destinations": [
-        "26.945637, 60.523491",
-        "26.944521, 60.525898",
-        "26.946527, 60.526283"
+        {
+            "longitude": -113.94466,
+            "latitude": 50.98033
+        },
+        {
+            "longitude": -114.08400,
+            "latitude": 50.99358
+        },
+        {
+            "longitude": -114.16615,
+            "latitude": 51.07062
+        }
     ],
-    "numberOfActors": 2
+    "numTrucks": 2
 }

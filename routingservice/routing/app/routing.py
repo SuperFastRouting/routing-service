@@ -20,6 +20,7 @@ def plot_drivables(osm):
     print(drive_net)
     drive_net.plot()
 
+# FR 12: Route.Optimize
 def calculate_basic_route(osm):
     """Calculates a basic route (testing function) (UNUSED)
 

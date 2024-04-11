@@ -12,6 +12,14 @@ from shapely.geometry import Point
 from routing.app import routing, clustering
 from .models import Route
 
+# On start OSM data processing
+global_OSM = routing.get_osm_data(debug=False)
+global_nodes_edges_tuple = routing.generate_nodes_and_edges(global_OSM)
+nodes_df = global_nodes_edges_tuple[0]
+edges_df = global_nodes_edges_tuple[1]
+global_graph = global_OSM.to_graph(nodes_df, edges_df, graph_type="networkx")
+
+# FR 14: Send.Route
 def route(request):
     """Routing Endpoint
 
@@ -48,13 +56,6 @@ def route(request):
         print(route_obj.get_route_id())
 
         # For points, x = lon, y = lat
-        # source_point = (26.931938, 60.538124)
-        # destination_points = [
-        #     (26.945637, 60.523491),
-        #     (26.944521, 60.525898),
-        #     (26.946527, 60.526283),
-        # ]
-
         path_distance_tuple = generate_path_coordinates(
             request,
             source_point,
@@ -88,25 +89,8 @@ def generate_path_coordinates(request, source, targets, num_agents):
     Returns:
     (route_coords, distances) (tuple): Coordinates of every node on a route + total distance of route
     """
-    # Generate OSM data reader
-    osm = routing.get_osm_data(debug=True)
-
-    # Generate nodes and edges of map
-    nodes_edges_tuple = routing.generate_nodes_and_edges(osm)
-    nodes_df = nodes_edges_tuple[0]
-    edges_df = nodes_edges_tuple[1]
-
-    # print("HERE")
-    # print(nodes_edges_tuple)
-    # print("HERE 2")
-    # print(nodes_df.to_string())
-    # print(edges_df.to_string())
-    # print(nodes_df[nodes_df['id'] == 3684592331])
-
-    # Generate working graph
-    G = osm.to_graph(nodes_df, edges_df, graph_type="networkx")
-    # print(source.x)
-    # print(source.y)
+    # Grab generated graph from OSM data loader
+    G = global_graph
 
     # Find nodes closest to given points
     source_node_id = ox.nearest_nodes(G, X=source[0], Y=source[1])
