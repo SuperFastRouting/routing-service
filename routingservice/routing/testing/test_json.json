@@ -1,21 +1,25 @@
 {
     "source": {
-        "home_long": -114.15405,
-        "home_lat": 51.15266
+        "home_long": -114.06,
+        "home_lat": 51.034
     },
     "destinations": [
         {
-            "longitude": -113.94466,
-            "latitude": 50.98033
-        },
-        {
-            "longitude": -114.08400,
-            "latitude": 50.99358
-        },
-        {
-            "longitude": -114.16615,
-            "latitude": 51.07062
-        }
+            "longitude": -114.1665,
+            "latitude": 51.1339
+          },
+          {
+            "longitude": -114.1171,
+            "latitude": 50.90886
+          },
+          {
+            "longitude": -113.96187,
+            "latitude": 50.97246
+          },
+          {
+            "longitude": -113.94401,
+            "latitude": 51.124413
+          }
     ],
-    "numTrucks": 2
+    "numTrucks": 1
 }

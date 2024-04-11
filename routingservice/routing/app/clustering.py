@@ -13,7 +13,7 @@ def hierarchal_cluster_nodes(nodes, num_clusters):
     clustered_nodes (list[tuple]): List of clusters
     """
     if (num_clusters < 2):
-        return [[0]]
+        return [[i for i in range(len(nodes))]]
     hierarchal_cluster = AgglomerativeClustering(n_clusters=num_clusters, metric='euclidean', linkage='ward')
     cluster_labels = hierarchal_cluster.fit_predict(nodes)
 
